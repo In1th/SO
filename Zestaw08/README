@@ -1,0 +1,125 @@
+========================================================================
+ README Zestawu 08
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 11.05.2021
+ modyfikowany ostatnio: 17.05.2021
+========================================================================
+
+A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Implementacja biblioteki statycznej oraz dzielonej libmsg. 
+	 	 Zawiera ona własny typ komunikat oraz dane funkcje:
+
+		  - int msgCreate(const char *name) - 
+		  		Tworzy kolejkę komunikatów o nazwie name i zwraca do 
+				niej deskryptor.
+		  
+		  - int msgOpen(const char *name) - 
+		  		Otwiera kolejkę komunikatów o nazwie name i zwraca do 
+				niej deskryptor.
+		  
+		  - void msgClose(int msgid) - 
+		  		Zamyka dostęp do kolejki od deskryptorze msgid.
+		  
+		  - void msgRm(const char *name) - 
+		  		Usuwa kolejkę komunikatów nazwie name.
+		  
+		  - void msgSend(int msgid, komunikat *msg) - 
+		  		Wysyła komunikat wskazywany przez msg do kolejki o 
+				identyfikatorze msgid.
+		  
+		  - void msgRecv(int msgid, komunikat *msg) - 
+		  		Odbiera z kolejki msgid komunikat i zapisuje go do msg.
+		  
+		  - void msgInfo(int msgid) - 
+		  		Wypisuje wszystkie informacje o kolejce komunikatów 
+				uzyskane przy pomocy mq_getattr().
+
+
+ 	A.2) Tworzy program realizujący serwer i klienta.
+
+			- Klient otwiera swoją kolejkę o nazwie "/PID" i czyta ze 
+			  standardowego wejścia operacje w formacie "xoy", gdzie x 
+			  i y są liczbami rzeczywistymi, a o jest operacją ze zbioru
+			  {+,-,*,/}. Następnie wysyła komunikat na kolejkę serwera 
+			  wraz ze swoim PID i odbiera wynik operacji ze swojej
+			  kolejki. Proces kończy się kombinacją klawiszy Ctrl+D lub
+			  awaryjnie sygnałem SIGINT (Ctrl+C).
+
+			- Serwer czeka na komunikaty od klientów. Otwiera on kolejke
+			  klienta i wysyła mu wynik operacji. Proces można zakońćzyć
+			  sygnałem SIGINT.
+
+			Oba wersje procesów wysyłają odpowiednie komunikaty przy
+			wysyłaniu i odbieraniu komunikatów.
+
+			Program składa się z 4 modułów:
+
+				- serwer.c - program dla procesu serwera
+
+				- klient.c - program dla procesu klienta
+
+				- srv.h - plik nagłówkowy z nazwą kolejki serwera
+
+				- libmsg.so - biblioteka współdzielona
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować bibliotekę statyczną libmsg.a należy wykonać komendę:
+ 		make libmsg.a
+
+	B.3) Aby skompilować bibliotekę dynamiczną libmsg.so należy wykonać komendę:
+ 		make libmsg.so
+
+ 	B.4) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make serwer.x
+
+	B.5) Aby uruchomić zadanie 2 z podanego wzoru należy wykonać komendę:
+ 		make run
+
+ 	B.6) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.7) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Funkcja mq_open tworzy lub otwiera kolejkę komunikatów i zwraca
+	  deskryptor lub -1 przy błędzie (ustawiając wartość errno). Pier-
+	  wszym argumentem jest nazwa kolejki która musi się zaczynać od /.
+	  Następnym argumentem są flagi z trybem otwarcia kolejki, co jest 
+	  potrzebną listą argumentów do otwarcia kolejki. Aby utworzyć ko-
+	  lejkę trzeba jeszcze dodać dwie dodatkowe flagi - tryb kolejki
+	  (przy podaniu flagi O_CREAT) oraz wskaźnik do struktury mq_attr,
+	  gdzie są atrybuty kolejki.
+
+	- Funkcje mq_send i mq_receive kolejno wysyłają i pobierają komuni-
+	  kat z deskryptora mqdes, do wskaźnika na znak msg_ptr, o wielkości
+	  msg_len, który ma być większy lub równy od mq_msgsize z atrybutów
+	  kolejki, z priorytetem msq_prio.
+
+	  W zależności od trybu kolejki te operacje mogą być blokujące.
+
+	- Kolejki komunikatów w standardzie POSIX widać w ścieżce
+	  /dev/mqueue
+
+	- By otrzymać informacje o atrybutach kolejki należy użyć funkcji
+	  mg_getattr, który w argumentach wymaga deskryptor kolejki oraz
+	  wskaźnik do struktury atrybutów, do których atrybuty kolejki mają
+	  być przekopiowane. Następnie można z nich korzystać jak z atry-
+	  butów struktury.
+
+========================================================================

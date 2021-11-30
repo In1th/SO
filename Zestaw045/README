@@ -1,0 +1,115 @@
+========================================================================
+ README Zestawu 04 i 05
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 3.03.2021
+ modyfikowany ostatnio: 19.03.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Program obsługującym obiekt pamięci dzielonej. Niepodanie flagi
+	     pokazuje opcje programu, a poniższe opcje wykonują dane akcje:
+
+		 	- c size - tworzy obiekt pamięci dzielonej o wielkości size
+			- d - usuwa obiekt pamięci dzielonej
+			- r - wypisuje zawartość obiektu pamięci dzielonej
+			- w - kopiuje zawartość standardowego wejścia do pamięci
+				  dzielonej
+			- i wypisuje informacje o obiekcie pamięci dzielonej
+
+ 		 Program składa się z dwóch modułów:
+
+ 		 	- shmuse.c - program główny
+			- libshmem.so - biblioteka dynamiczna
+
+ 	A.2) Program wykonujący problem producenta konsumenta z obiektem
+	 	 pamięci dzielonej oraz semaforami.
+
+		 Program składa się z pięciu modułów:
+
+ 		 	- glomny.c - program główny
+			- producent.c, konsument.c - programy potomne
+			- bufor.h, bufor.c - moduł obsługujący bufor cykliczny
+			- libsem.a - biblioteka statyczna
+			- libshmem.so - biblioteka dynamiczna
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make shmuse.x
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make glowny.x
+
+ 	B.4) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+	- W zadaniu 3 są dwa semafory - producenta i konsumenta.
+
+	  Semafor producenta jest inicjalizowany z liczbą równą wielkości bu-
+	  fora cyklicznego i jego wartość mówi, ile jeszcze jest wolnych
+	  miejsc w tym buforze. 
+
+	  Semafor konsumenta jest inicjalizowany z zerem i jego wartość mówi,
+	  ile pakietów danych jest do odczytania z bufora.
+
+	  Prodducent opuszcza swój semafor kiedy wpisuje dane oraz podnosi
+	  semafor konsumenta, kiedy jest coś do wczytania i na odwrót.
+
+	- //PRODUCENT
+
+	  semP(producent);
+	  //sekcja krytyczna
+	  semV(konsument);
+
+	  //KONSUMENT
+
+	  semP(konsument);
+	  //sekcja krytyczna
+	  semV(producent);
+
+	- Niezależne procesy mają dostęp do jednego obiektu pamięci dzielo-
+	  nej, gdy otwórzą go oraz zmapują go w swojej przestrzeni adreso-
+	  wej. Pozwala to na dzielenie danych pomiędzy procesami, które się
+	  aktualizują dla wszystkich procesów, które otworzyły sobie plik.
+
+	- Biblioteki dynamiczne to zbiór plików obiektowych, do których
+	  plik wykonywalny dostaje informacje, które z nich potrzebuje, ale 
+	  są dopieru używane po uruchomieniu. Zaletą ich jest to, że nie 
+	  marnujemy przestrzeni na części biblioteki, które nie są używane.
+
+	- Aby utwórzyć bibliotekę dynamiczną, trzeba wykonać komendę:
+
+		gcc -c -O -fPIC plik.c (kompilacja do pliku obiektowego)
+
+		gcc -shared 0o libplik.so plik.o (tworzenie biblioteki dzielonej)
+
+	  Używamy ją dodając dwie flagi - -L. mówiąca, by linker szukał bi-
+	  blioteki w ścieżce lokalnej i -lplik, który mówi jaki plik obie-
+	  ktowy przyłączamy.
+
+	  Należy również dodać do zmiennej środowiskowej LD_LIBRARY_PATH
+	  ścieżkę do katalogu zawierającego bibliotekę poprzez:
+
+	  	export LD_LIBRARY_PATH=. (gdzie naszą ścieżką dla ścieżka 
+		  						 lokalna)
+
+	  Nazwy bibliotek statycznych mają rozszerzenie .so 
+
+
+========================================================================

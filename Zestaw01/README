@@ -1,0 +1,131 @@
+========================================================================
+ README Zestawu 01
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 02.03.2021
+ modyfikowany ostatnio: 17.03.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Program wypisujący nazwę procesu oraz jego UID, GID, PID, 
+ 		 PPID i PGID w formacie:
+ 		 "name = <nazwa_procesu>, UID = <wartość>, GID = <wartość>,
+ 		 PID = <wartość>, PPID = <wartość>, PGID = <wartość>"
+
+ 		 Program nie zawiera żadnych mechanizmów obsługi błędów, gdyż
+ 		 używane funckje zawsze się prawidłowo wykonują.
+
+ 		 Program składa się z dwóch modułów:
+
+ 		 	- main.c - program główny
+ 		 	- procinfo.c, procinfo.h - funckja wykonująca opisane wyżej
+ 		 							   zachowanie
+
+ 	A.2) Program kopiujący zawartość pliku źródłowego (nazwa z argv[1]),
+ 		 wczytując ją do buforu a następnie przekopiowanie jej do pliku
+ 		 docelowego (nazwa z argv[2]).
+
+ 		 Program nie wykona swojej funkcji, gdy nie otrzyma dokładnie 2
+ 		 argumentów przy wykonaniu lub gdy jakakolwiek funkcja napotka
+ 		 błąd, który zostanie wypisany na standardowe wyjście.
+
+ 		 Program składa się z jednego modułu:
+
+ 		 	- kopiuj.c - program główny
+
+ 	A.3) Program wypisujący na początku procinfo() dla samego siebie, a
+ 		 potem trzy razy w pętli for wykonuje funkcje fork().
+ 		 Wszystkie procesy potomne wypisują siebie z formatowaniem uła-
+ 		 twiającym identyfikacje, który proces jest najstarszy, a który
+ 		 najmłodszy. Procesy macierzyste czekają na skończenie działania
+ 		 procesów potomnych.
+
+ 		 Program składa się z jednego modułu:
+
+ 		 	- procesy.c - program główny
+
+ 	A.4) Program wykonuje to samo co A.3), lecz dodatkowo każdy proces
+ 		 potomny zmienia swój identyfikator grupy procesów swoim
+ 		 identyfikatorem.
+
+ 		 Program składa się z jednego modułu:
+
+ 		 	- lider.c - program główny
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .x należy wykonać komendę:
+ 		make procinfo.x
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make kopiuj.x
+
+ 	B.4) Aby skompilować zadanie 3 do pliku .x należy wykonać komendę:
+ 		make procesy.x
+
+ 	B.5) Aby skompilować zadanie 4 do pliku .x należy wykonać komendę:
+ 		make lider.x
+
+ 	B.6) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.7) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Funkcja fork() duplikuje proces, który go wykonał, od tego samego
+ 	  momentu co funkcja macierzysta (po wywołaniu funkcji fork). Proces
+ 	  potomny posiada ten sam program, co funkcja ją wywołująca i te
+ 	  same zmienne z wartościami. By procesy były w stanie wiedzieć,
+ 	  czy są procesem macierzystym, czy potomnym, fork() zwraca 0 dla
+ 	  procesu potomnego i PID procesu potomnego dla procesu macierzy-
+ 	  stego. Jeżeli wystąpi jakiś błąd, to funkcja zwróci -1 i ustawi
+ 	  wartość errno.
+
+    - W zadaniu procesy powstaje 7 procesów (nie licząc procesu, który
+      my wywołujemy z powłoki), ponieważ utworzone procesy "dostają"
+      od procesu macierzystego wartość zmiennej 'i', czyli iteratora
+      w pętli for. Dlatego też wykonują się tyle razy, ile jeszcze mogą
+      się wywołać z otrzymanej wartości iteratora.
+ 	
+    - Dla pętli for wykonującej się n razy fork wywoła się 2^n - 1
+      razy (nie licząc procesu, który my wywołujemy z powłoki). Możemy
+      to pokazać interpretując wszystkie procesy jako drzewo, gdzie
+      krawędź jest relacją "rodzic-potomek" pomiędzy procesami, a
+      korzeniem jest proces wywoływany z powłoki. Zauważyć można, że
+      ilość procesów mających ten sam poziom k jest równa dwumianowi
+      "n na k". Sumując ilość procesów dla poziomów od 1 do n otrzy-
+      mamy liczbę 2^n - 1.
+
+    - Zamiast wstawiania funkcji wait() można dać funkcję sleep(), wsta-
+      wiając taki argument dla obu procesów, aby proces macierzysty cze-
+      kał dłużej niż proces potomny lub by proces macierzysty czekał
+      w przybliżeniu tyle czasu, ile proces macierzysty by się wykony-
+      wał. Odnalezienie jednak takiej wartości jest dość trudnym zada-
+      niem, zwłaszcza że proces potomny może się wykonywać zmienną
+      ilość czasu, więc lepiej jest podać jakąś stałą wartość.
+
+    - Funkcja open() zwraca numer deskryptora przydzielony dla otwartego
+      pliku w postaci zmiennej typu int. Dla błędu w otwieraniu pliku
+      funkcja zwraca -1 i ustawia wartość errno.
+
+    - Funkcja read() zwraca ilość przeczytanych bajtów z pliku, a
+      write() zwraca ilość wpisanych bajtów do pliku, w postaci zmiennej
+      ssize_t. Obie funkcje przy napotkaniu błędu zwracają -1 i usta-
+      wia wartość errno.
+
+========================================================================

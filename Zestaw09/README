@@ -1,0 +1,81 @@
+========================================================================
+ README Zestawu 09
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 27.05.2021
+ modyfikowany ostatnio: 27.05.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Zadanie implementuje wielowątkowy program 
+
+		 Program skałda się z jednego modułu:
+
+		 	- wykluczanie.c - główny moduł
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .a należy wykonać komendę:
+ 		make wykluczanie.a
+
+ 	B.3) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.4) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Proces jest osobnym programem, który się wykonuje, ma swoją wła-
+	  sną przestrzeń adresową, itp. Wątek jest wydzieloną częścią pro-
+	  cesu wykonującą określone zadanie, więc dzieli on przestrzeń
+	  adresową z innymi wątkami.
+
+	- pthread_create tworzy wątek o id zapisywanym w thread (1. argu-
+	  ment) z atrybutami w specjalnej strukturze na atrybuty wątku o
+	  adresie attr (2. argument), który będzie wykonywał funkcję zwra-
+	  cającą wskaźnik void* i przyjmującą też wskaźnik void*, której
+	  wskaźnik został podany w start_routine (3. argument). Ostatni 
+	  argument funkcji pthread_create to wskaźnik na argument, który
+	  funkcja wskazana w 3. argumentcie otrzymuje.
+
+	- pthread_join jest odpowiednikiem funkcji wait.
+
+	- Muteks jest rodzajem semafora, lecz jest on tylko dwustanowy.
+
+	- Muteks możemy inicjalizować albo korzystając z predefiniowanej
+	  stałej PTHREAD_MUTEX_INITIALIZER lub używając funkcji
+	  pthread_mutex_init.
+
+	- Muteks możemy zablokować (pthread_mutex_lock), by wątki próbujące
+	  go zablokować nie mogły tego zrobić, odblokować 
+	  (pthread_mutex_unlock)przez to wątek, który utknął na blokowaniu 
+	  będzie już to mógł wykonać. Jeżeli nie chcemy by mutex nie bloko-
+	  wał wątku, to możemy użyć funkcji pthread_mutex_trylock, która
+	  po prostu zwróci -1 przy nieudanej próbie zablokowania mutexu.
+	  Można również mutex usunąć za pomocą pthread_mutex_destroy.
+
+	- Typ void * (*) () oznacza wskaźnik na funkcję bez argumentów, 
+	  zwracającą typ void*.
+
+	- Operacje atomowe, to takie operacje, które muszą być wykonane w
+	  całości i podczas takiej operacji proces nie może zostać wywła-
+	  szczony. Jeżeli jednak dobrze napiszemy wzajemne wykluczanie się
+	  procesów, przez co nie będą mogły sobie przeszkdzać podczas wyko-
+	  nywania operacji w sekjci krytycznej, to nie trzeba z nich korzy-
+	  stać.
+
+========================================================================

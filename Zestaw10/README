@@ -1,0 +1,88 @@
+========================================================================
+ README Zestawu 10
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 27.05.2021
+ modyfikowany ostatnio: 31.05.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Program implementujący algorytm piekarni z wykładu.
+
+		 Program skałda się z jednego modułu:
+
+		 	- piekarnia.c - moduł główny
+
+ 	A.2) Program implementujący algorytm piekarni z licznikiem.
+
+ 		 Program skałda się z jednego modułu:
+
+		 	- piekarnia_licznik.c - moduł główny
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .a należy wykonać komendę:
+ 		make piekarnia.a
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make piekarnia_licznik.x
+
+ 	B.4) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.5) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Tylko jeden proces wchodzi do sekcji krytycznej, gdyż algorytm po-
+	  zwala do niej wejść tylko wątkowi z najmniejszym numerem, a jeżeli
+	  parę wątków ma ten sam numer to numer wątku jest brany pod uwagę.
+	  Na przykład gdyby nie było tego wymogu z numerem wątku, to parę
+	  wątków z tym samym numerem weszłoby do sekcji krytycznej. 
+
+	- Zakleszczenie w tym algorytmie może pochodzić z dwóch pętli while:
+
+		1) pętla czekająca kiedy jakiś wątek zakończy wybierać numer, co 
+		   nie może się zablokować, przez co w jakimś punkcie wątek z
+		   tej pętli wyjdzie
+
+		2) pętla czekająca, jeżeli jakiś wątek wyraził chęć do wejścia 
+		   do sekcji krytycznej i ma mniejszy numer niż proces lub przy
+		   tym samym numerze większy numer wątku. Jeżeli wątek w tej
+		   pętli czeka, to musi istnieć jeden wątek, który ma najniższy
+		   numer i wyjdzie z tej pętli, by wykonać swoją sekcję kryty-
+		   czną. Po niej zeruje swój numer przez co odblokowuje wątek
+		   następny w kolejności, itd.
+
+	  Można to popsuć poprzez usunięcie zerowania swojego numeru przez 
+	  proces wychodzący z sekcji krytycznej.
+
+	- Algorytm nie prowadzi do zagłodzenia, gdyż nawet w najbardziej pe-
+	  symistycznym przypadku, kiedy wszystkie N wątków dostanie ten
+	  sam numer, to wątek o numerze N - 1 wykonana swoją sekcję kryty-
+	  czną po tym jak wykonają ją wątki o numerach od 0 do N-2 i nie
+	  zostaną one ponownie dopuszczone do sekcji krytycznej, aż wątek
+	  N - 1 nie wykona swojej sekcji krytycznej, gdyż będzie miał od
+	  nich najmniejszy numer.
+
+	  To można zepsuć na przykład zwiększając numer procesu w drugiej
+	  pętli while.
+
+	- Kompilator minimalnie musi zapewnić atomowość operacji zapisu na
+	  zmiennych liczb naturalnych.
+
+========================================================================

@@ -1,0 +1,148 @@
+========================================================================
+ README Zestawu 02
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 20.03.2021
+ modyfikowany ostatnio: 27.03.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+	Zestaw poza niżej podanymi plikami źródłowymi posiada pliki 
+	"procinfo.h" oraz "procinfo.c", ze względu na to, że część zadań
+	wymaga użycia funkcji procinfo.
+
+ 	A.1.1) Zmodyfikowany program procesy.c, który wypisuje proces 
+	 	   macierzysty i jego trzy procesy potomne (według grafu 
+		   Drzewko 1 w Zestawie 2).
+
+		   Program składa się z dwóch modułów:
+
+		   	- drzewko1.c - program główny
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.1.2) Zmodyfikowany program procesy.c, który wypisuje proces 
+	 	   macierzysty i jego następne trzy pokolenia potomków.
+		   (według grafu Drzewko 2 w Zestawie 2).
+
+		   Program składa się z dwóch modułów:
+
+		   	- drzewko2.c - program główny
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.2) Zmodyfikowany program procesy.c, który zamiast sam wywoływać
+		 funkcję procinfo, to wywołuje ./potomny.x za pomocą execv, by
+		 ten wywołał wcześniej wspomnianą funckję.
+
+		 Program składa się z dwóch modułów:
+
+		   	- macierzysty.c - program główny
+
+			- potomny.c - program wywoływany przez execv
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.3.1) Program tworzący proces zombie oraz wypisujący komunikat o 
+		   utworzeniu takiego procesu.
+
+		   Program składa się z dwóch modułów:
+
+		   	- zombi.c - program główny
+
+	A.3.2) Program tworzący proces ocierocony, który wypisuje komunikat
+	       o osieroceniu go przez proces macierzysty, a potomek wywołu-
+		   je funkcje procinfo przed i po osieroceniu, by pokazać, że 
+		   proces jest adoptowany przez init lub systemd.
+
+		   Program składa się z dwóch modułów:
+
+		   	- orphan.c - program główny
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.3.3) Program który wypisuje "pierwszy komunikat", a następnie
+		   wykonuje proces za pomocą funkcji execl.
+
+		   Program składa się z dwóch modułów:
+
+		   	- execute.c - program główny
+
+			- potomny.c - program wywoływany przez execv
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .x należy wykonać komendę:
+ 		make zadanie1
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make zadanie2
+
+ 	B.4) Aby skompilować zadanie 3 do pliku .x należy wykonać komendę:
+ 		make zadanie3
+
+ 	B.5) Aby skompilować dowolny plik źródłowy do pliku .x należy 
+	     wykonać komendę:
+ 		make <nazwa_pliku>.x
+
+ 	B.6) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.7) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+	- Teraz w zadaniu 2. powstają tylko 3 procesy, gdyż execv kończy 
+	  proces, który wywołał tą funckję, wraz z pętlą for. Z tego też
+	  powodu procesy potomne nie będą tworzyć nowych procesów i tylko
+	  proces macierzysty je tworzy.
+
+	- Po n-tym wywołaniu fork-exec jak w zadaniu 2. powstaje tylko n
+	  procesów, gdyż przy wywołaniu exec proces, który ją wywołał się
+	  kończy, więc nie będzie dalej wywoływał pętli od miejsca, 
+	  w którym został stworzony.
+
+	- Funkcja execl kończy działanie procesu, który ją wywołał i na jego
+	  miejsce wywołuje program z pierwszego argumentu. Dodatkowo przeka-
+	  zuje on resztę swoich argumentów jako argumenty nowego procesu, aż
+	  napotka wartość NULL. Zwraca on tylko i wyłącznie -1, kiedy napo-
+	  tka błąd, ustawiając wartość errno. 
+
+	  Funkcja execv działa tak samo jak execl, tylko argumenty nowego
+	  procesu muszą być w tablicy wskaźników, gdzie ostatnim elementem
+	  jest NULL.
+
+	- Proces init lub systemd pełnią rolę adoptowania procesów osiero-
+	  conych przez swoje procesy macierzyste i czekają na nie, by nie
+	  stały się procesami zombie.
+	  
+	- Procesy zombie to procesy potomne, na których wykonanie procesy 
+	  macierzyste nie czekają.
+
+	- Procesy osierocone to procesy potomne, których procesy macierzyste
+	  zakończyły się w trakcie wykonywania procesu potomnego.
+ 	
+
+========================================================================

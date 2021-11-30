@@ -1,0 +1,189 @@
+========================================================================
+ README Zestawu 06
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 20.04.2021
+ modyfikowany ostatnio: 27.04.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Zadanie implementuje bibliotekę statyczną sem zawierające fun-
+	 	 kcje opisane w skrypcie oraz definiuje typ semid.
+
+		 Program skałda się z jednego modułu:
+
+		 	- sem.h, sem.c - biblioteka statyczna sem
+
+ 	A.2) Program, który na podstawie jednoliterowego argumentu wykonuje
+	     dane operacje:
+
+			- i -Inicjuje semafor i wypisuje o nim informacje,
+			- r - Usuwa semafor,
+			- p - Opuszcza semafor i wypisuje o nim informacje ,
+			- v - Podnosi semafor i wypisuje o nim informacje,
+			- q - Wypisuje informacje o semaforze.
+
+		 Jeżeli zostanie podana zła ilość argumentów lub zła litera to
+		 zostanie wypisany błąd.
+
+ 		 Program składa się z dwóch modułów:
+
+ 		 	- semuse.c - program główny
+
+			- sem.h, sem.c - biblioteka statyczna sem
+
+ 	A.3) Program implementujący wzajemne wykluczanie się procesów.
+
+	 	 Proces ./powielacz.x tworzy semafor nazwany, plik "numer.txt",
+		 w którym znajduje się 0 oraz tworzy N procesów potomnych za 
+		 pomocą fork + exec, w zależności od trzeciego argumentu fun-
+		 kcji main.
+
+		 Procesy wywoływane przez ./powielacz.x jest brany z drugiego
+		 argumentu main, ale do tej implementacji jest to ./prog.x.
+		 Proces ten otwiera semafor i wchodzi w strefe krytyczną tyle
+		 razy, ile zostału mu podane w argumencie main. Do strefy kryty-
+		 cznej wchodzi on opuszczając semafor, a wychodzi podnosząc. W
+		 samej strefie proces odczytuje wartość z pliku "numer.txt",
+		 zamyka plik, po losowym czasie uśpienia zwiększa wartość pliku
+		 o 1 i zapisuje go do tego samego pliku.
+
+
+		 Procesy ./prog.x, jak i ./powielacz.x po skończonej pracy zamy-
+		 kają semafory, a później jest on usuwany. Proces macierzysty
+		 czeka na swoje procesy potomne funkcją wait.
+
+		 W trakcie wykonywania programu wypisywane są odpowiednie komu-
+		 nikaty.
+
+ 		 Program składa się z trzech modułów:
+
+ 		 	- powielacz.c - program, który będzie procesem macierzystym
+
+			- prog.c - program, który będzie procesem potomnym
+
+			- sem.h, sem.c - biblioteka statyczna sem
+
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .a należy wykonać komendę:
+ 		make libsem.a
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make semuse.x
+
+ 	B.4) Aby skompilować zadanie 3 do pliku .x należy wykonać komendę:
+ 		make powielacz.x
+
+ 	B.5) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.6) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Semafor jest nieujemną liczbą całkowitą, która mówi o tym ile pro-
+	  cesów może jeszcze wejść do strefy krytycznej. Dzielone one są po-
+	  między procesami. Pozwalają one na synchronizację proseców oraz 
+	  kontrolowania realizacji sekcji krytycznych przez procesy.
+
+	- Na semaforze można wykonać 7 operacji:
+
+		> Utworzyć semafor - tworzymy semafor i otwieramy go
+
+		> Otworzyć semafor - otwieramy semafor do użytku
+
+		> Opuścić semafor - zmniejszamy wartość semafora o 1, ale jeżeli
+							nie możemy tego zrobić to proces jest bloko-
+							wany
+
+		> Podnieść semafor - zwiększamy wartość semafora o 1 i wznawia-
+							 my proces zablokowany przy opuszczaniu se-
+							 maforu
+
+		> Wypisać wartość semafora
+
+		> Zamknąć semafor - zamykamy semafor, z którego korzystaliśmy
+
+		> Usunąć semafor - usuwamy semafor, by nie zalegał w pamięci
+						   systemu
+
+	- By procesy wspólnie mogły korzystać z semaforów to musi on zostać
+	  utworzony. Następnie procesy muszą go otworzyć, a pod koniec pracy
+	  zamknąć.
+
+	  By wejść do sekcji krytycznej proces musi opuścić semafor, a by 
+	  z niej wyjść to musi go podnieść.
+
+	- (zakładam że semafor jest już utworzony i zostanie gdzieś indziej
+	   usunięty) 
+
+		/* ... */
+
+		sem_t *sem = sem_open("/nazwa_semaforu",0200,0644,1);
+
+		/* ... */
+
+		while(1) {
+
+			/* ... */
+
+			sem_P(sem);
+
+			//sekcja krytyczna
+
+			sem_V(sem);
+
+			/* ... */
+
+		}
+
+		sem_close(sem);
+
+	- Biblioteka statyczna to archiwum plików obiektowych (.o) zawie-
+	  rające wszystkie funckje, symbole oraz definicje. Następnie jest
+	  ona linkowana do programu za pomocą odpowiednich flag.
+
+	  Zaletą bibliotek statycznych jest to, że po pierwsze nie linkujemy
+	  każdego pliku obiektowego z osobna, tylko całą bibliotekę i z tego
+	  też powodu jest to robione o wiele szybciej. Dodatkowo jeżeli 
+	  chcemy ją rozszerzyć o nowy plik obiektowy to po prostu musimy go
+	  dodać do archiwum.
+
+	- By utworzyć bibliotekę statyczną, to musimy stworzyć archiwum, w
+	  którym znajdują się pliki obiektowe.
+
+	  Na początku kompilujemy program (bez linkowania do pliku obiekto-
+	  wego) używając tej komendy:
+
+	  	gcc -c plik.c
+
+	  Następnie dodajemy plik obiektowy do naszej biblioteki:
+
+	  	ar rv lib.a plik.o
+
+	  Jeżeli teraz chcemy użyć tej biblioteki, to musimy dodać dwie
+	  flagi:
+
+	  	gcc -L. program.c -lplik
+
+	  Flaga .L mówi dla kompilatora, gdzie szukać bibliotek, co jest za-
+	  znaczone na folder bieżący, a flaga -l mówi o jaki plik obiektowy
+	  w bibliotece nam chodzi.
+
+========================================================================

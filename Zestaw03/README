@@ -1,0 +1,170 @@
+Size: 5464 B
+========================================================================
+ README Zestawu 03
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 20.03.2021
+ modyfikowany ostatnio: 31.03.2021
+========================================================================
+
+
+ A) ZAWARTOŚĆ ZESTAWU:
+
+	Zestaw poza niżej podanymi plikami źródłowymi posiada pliki 
+	"procinfo.h" oraz "procinfo.c", ze względu na to, że część zadań
+	wymaga użycia funkcji procinfo.
+
+ 	A.1) Program przygotowujący proces do odbierania sygnałów z dwóch 
+	 	 argumentów funkcji main. Pierwszy argument po nazmie programu
+		 odpowiada za zachowanie, jakie ma proces wykonać odbierając
+		 sygnał:
+
+		 	- d - proces wykona operacje domyślną dla sygnału
+			
+			- i - sygnał zostanie zingorowany (jeżeli może go zignoro-
+				  wać)
+
+			- p - sygnał będzie przechwytywany przez funkcję wypisz 
+				  (oblsuga.c:27), która wypisze nr sygnału (jeżeli 
+				  sygnał może być przechwycony)
+
+		 W następny argument odpowiada za numer sygnału, który ma być
+		 obługiwany. Podanie nieprawidłowej ilości argumentów wyrzuca
+		 błąd i ustawia wartość errno.
+
+		 Program składa się z dwóch modułów:
+
+		   	- obsluga.c - program główny
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.2) Program tworzy proces potomny z pomocą fork(), a następnie w
+		 tym procesie wywołuje "./obsluga.x" poprzez execl(). Kiedy
+		 nowy proces ustawi obsługę sygnału, to proces macierzysty wysy-
+		 ła mu ten sygnał za pomocą funkcji kill().
+
+		 Przyjmuje on te same argumenty, co program.c.
+
+		 Program składa się z dwóch modułów:
+
+		   	- wysylaj.c - program główny
+
+			- obsluga.c - program wywoływany przez execl
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+	A.3) Program, który tworzy proces potomny, który ustawia się na
+		 lidera grupy, ustawia ignorowanie sygnałów oraz tworzy kilka
+		 procesów potomnych (zależy od zmiennej iterations)
+
+		 Przyjmuje on te same argumenty, co program.c.
+
+		 Program składa się z dwóch modułów:
+
+		   	- grupa.c - program główny
+
+			- obsluga.c - program wywoływany przez execl
+
+			- procinfo.h, procinfo.c - implementacja wymaganej funkcji
+									   procinfo
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .x należy wykonać komendę:
+ 		make obsluga.x
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make wysylaj.x
+
+ 	B.4) Aby skompilować zadanie 3 do pliku .x należy wykonać komendę:
+ 		make grupa.x
+
+ 	B.6) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.7) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+	- Opisy czterech wybranych procesów, w tym dwóch nieprzechwy-
+	  tywalnych:
+
+		> SIGALRM - sygnał wywoływany przez funkcję systemową alarm;
+					pozwala na powiadomienie procesu po określonej 
+					ilości sekund
+
+		> SIGUSR1 - sygnał użytkownika nr 1: jeden z sygnałów, który 
+					może być zaprogramowany przez programistę jak on
+					chce, domyślnie powoduje to zakończenie procesu
+
+		> SIGSTOP - zatrzymanie procesu; pozwala zatrzymać proces, a ten
+					proces nie może zignorować tego sygnału
+
+		> SIGKILL - sygnał bezwarunkowego zatrzymania procesu; pozwala
+					bezwględnie zatrzymać proces, który na przykład jest
+					w nieskończonej pętli
+
+	- Sygnały służą do komunikacji między procesami w najprostrzy sposób.
+	  Mają wiele zastosowań, informują o jakimś zdarzeniu i powodują
+	  asynchroniczne przerwanie działania procesu, w dowolnym czasie.
+
+	- Funkcja signal() ustawia jaka funkcja ze wskaźnika na funkcję void
+	  przyjmującą inta z drugiego argumentu ma obsługiwać sygnał podany 
+	  w pierwszym argumencie. Zwraca ona wskaźnik na funkcje void mającą
+	  argument typu int poprzedniego dyspozytora sygnału, przy porażce 
+	  -1 i ustawia wartość errno. Ta funkcja nie wysyła sygnału.
+
+	- Funkcja kill() wysyła sygnał sig z drugiego argumentu w zależności
+	  od pierwszego argumentu pid:
+
+	  	> pid > 0 -> do procesu o PID = pid
+		> pid == 0 -> do procesów z grupy procesu, który wykonał kill
+		> pid < 0 -> do grupy procesów o PGID = -pid
+
+	  Jeżeli sig == 0, to funkcja nie wyśle sygnału, lecz sprawdzi czy
+	  dane procesy istnieją. Przy sukcesie zwraca 0, przy porażce -1 i
+	  zmienia wartość errno.
+
+	- Może sprawdzić czy istnieje jakiś proces o pid wywołując 
+	  kill(pid,0), a istnienie grupy pgid za pomocą kill(-pgid,0). Jeżeli
+	  zwróci 0, to znaczy że istnieją, jeżeli jednak -1, to nie istnieją.
+
+	- kill(0,0) sprawdza czy istnieje grupa procesu, który ją wykonał,
+	  lecz z racji tego, że każdy proces jest przypisany do jakieś grupy
+	  to funkcja zawsze zwraca 0.
+
+	- Proces macierzysty na sygnał można uodpornić funckją 
+	  signal(sig,SIG_IGN), czyli ustawić go na ignorowanie sygnału.
+	  Można to zrobić by proces nie reagował na sygnały, które są nie
+	  dla niego.
+
+	- Można to zrobić za pomocą komendy fg.
+
+	- Sygnał SIGCHLD jest wysyłany procesowi macierzystemu, przez jego
+	  proces potomny, który się kończy.
+
+	- Za pomocą skrótów można wywołać takie sygnały:
+
+		> SIGINT - Ctrl+c
+		> SIGQUIT - Ctrl+\
+		> SIGTSTP - Ctrl+z
+
+	- Funkcja pause() sprawia, że proces oczekiwuje na nadanie niemu
+      sygnału. Zwraca -1 jeżeli sygnał nie powoduje zakończenia procesu,
+	  przy porażce nic, ale zmienia wartość errno.
+
+========================================================================

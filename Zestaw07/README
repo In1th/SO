@@ -1,0 +1,151 @@
+========================================================================
+ README Zestawu 07
+========================================================================
+ autor: Mateusz Kruk, grupa 7.
+ utworzony: 3.05.2021
+ modyfikowany ostatnio: 10.05.2021
+========================================================================
+
+A) ZAWARTOŚĆ ZESTAWU:
+
+ 	A.1) Program wykonujący problem producenta-konsumenta z potokiem
+	 	 nienazwanym. Tworzy on wcześniej wspomniany potok, a następnie
+	     za pomocą funkcji fork tworzy proces potomny, który ma wykony-
+		 wać funkcje konsumenta. Proces macirzysty wykonuje funkcje
+		 producenta.
+
+		 Producent dopóki ma jeszcze liczbę bajtów do wczytania to dyna-
+		 micznie wczytuje pakiet danych, do spacji, znaku nowej linii 
+		 lub zapełnienia buforu na pakiet danych. Następnie wysyła go na
+		 potok i zmniejsza liczbę bajtów do wczytania.
+
+ 		 Konsument wczytuje liczbę pakiet z potoku, zapisuje go do pliku
+		 docelowego i zmniejsza liczbę bajtów do zapisania.
+
+		 Oba procesy przed wykonaniem swojej funkcji czekają od 1us do 
+		 1s. Gdy proces zostanie zakończony to wywoływana jest funkcja
+		 sprzatanie(), która zamyka wszystkie otwarte deskryptory.
+
+		 Nazwy pliku, z którego producent czyta i do którego konsument
+		 zapisuje są przekazywane w kolejno drugim i trzecim argumncie 
+		 funkcji main.
+
+ 		 Program składa się z jednego modułu:
+
+ 		 	- prodkons.c - program główny
+
+ 	A.2) Program wykonujący problem producenta-konsumenta z potokiem
+	 	 nazwanym. Porces macierzysty tworzy potok nazwany, a 
+		 następnie robiąc fork + exec tworzy dwa procesy potomne dla
+		 producenta i konsumenta. Producent i konsument wykonują to
+		 samo co w zadaniu 1, z paroma różnicami:
+
+		 	- procesy wykonują swoją funkcję dopóki pakiety danych są
+			  większe od 0
+			
+			- przed właściwym pakietem danych producent wysyła konsu-
+			  mentowi liczbę bajtów do wczytania
+
+		 Procesy potomne przy zakończeniu zamykają swoje deksryptory, a
+		 proces macierzysty usuwa przy zakończeniu potok.
+
+		 Program głowny przyjmuje po nazwie programu 3 argumenty: nazwa
+		 potoku, nazwa pliku dla producenta i nazwa pliku dla konsumen-
+		 ta.
+
+ 		 Program składa się z trzech modułów:
+
+ 		 	- fifo.c - program główny
+
+			- producent.c - program wykonujący funkcje producenta
+
+			- konsument.c - program wykonujący funkcje konsumenta
+
+------------------------------------------------------------------------
+
+ B) KOMPILOWANIE PROGRAMÓW
+
+ 	Zestaw zawiera plik Makefile do kompilacji, linkowania
+	i uruchamiania powyzszych programow na raz lub osobno, a takze 
+	czyszczenia katalogu i jego archiwizacji.
+
+ 	B.1) Aby skompilować wszystkie programy, należy wykonać komendę:
+ 		make all
+
+ 	B.2) Aby skompilować zadanie 1 do pliku .x należy wykonać komendę:
+ 		make prodkons.x
+
+ 	B.3) Aby skompilować zadanie 2 do pliku .x należy wykonać komendę:
+ 		make fifo.x
+
+ 	B.6) Aby usunąć wszystkie pliki tymczasowe należy wykonać komendę:
+ 		make clean
+
+ 	B.7) Aby zarchiwizować cały zestaw należy wykonać komendę:
+ 		make archive
+
+------------------------------------------------------------------------
+
+ C) ODPOWIEDZI NA PYTANIA
+
+ 	- Funkcja pipe() zwraca 0, jeżeli udało się jej utworzyć potok
+	  nienazwany, -1 jeżeli wystąpił błąd. Funkcja przy ostatniej opcji
+	  ustawia wartość errno.
+
+	- Funkcja pipe() tworzy potok nienazwany tylko dla procesów pokre-
+	  wnych oraz wymaga podania w argumencie wskaźnika do dwuelementowej
+	  tablicy zmiennych typu int. By zamknąć potok nienazwany trzeba
+	  zamknąć jego deskryptory.
+
+	  Funkcja mkfifo() tworzy potok nazwany o podanej nazwie w pierwszym
+	  argumencie oraz opcjami desępu do potoku w drugim. Potok nazwany w
+	  przeciwieństwie do potoku nazwanego jest widoczny w ścieżce pro-
+	  cesu, który go utworzył i mogą z niego korzystać wszystkie proce-
+	  sy, np. za pomocą funkcji open(), read() czy write(). By poprawnie
+	  zamknąć deskryptor w procesie, który go otworzył, a następnie użyć 
+	  funkcji unlink() do usunięcia potoku.
+
+	- Skrót FIFO jest akronimem od first in, first out, co z angielskie-
+	  go oznacza, że pierwszy element wstawiony do tej struktury danych
+	  pierwszy z niego wyjdzie. Jest to równoznaczne z kolejką.
+
+	- Deskryptor pliku to nieujemna liczba całkowita związana z otwartym
+	  plikiem. Z góry deskryptory 0, 1 i 2 są przeznaczone na standardo-
+	  we strumienie wejścia, wyjścia i wyjścia błędów. Służą one do od-
+	  woływania się do plików przez niektóre funkcje systemowe jak np.
+	  write(), czy read(). Deskryptor można utworzyć za pomocą funkcji
+	  open().
+
+	- Deskryptor zamykamy fukncją close(), gdzie w argumencie podajemy
+	  numer deskryptora. Dzięki temu, że zamkniemy deskryptor to możemy
+	  go jeszcze użyć przed zakończeniem procesu z innym plikiem.
+
+	- Jeżeli w zadaniu 1 nie zamknięmy deskryptorów, to staną się dwie
+	  rzeczy. Po pierwsze przy zakończeniu procesu pomimo tego, że nie
+	  zamknęliśmy deskryptorów jawnie, to i tak one zostaną zamknięte.
+	  Po drugie nie zamykanie deksryptorów jawnie może się wiązać z pro-
+	  blemami w procesie, jak np. w zadaniu pierwszym deskryptory fd[0] 
+	  i fd[1] w odpowiednich procesach z deskryptora potoku są zastępo-
+	  wane przez deskryptor pliku, do którego piszą/czytają. Bez zam-
+	  knięcia deskryptora potoku procesy mogą zająć kolejny numer na 
+	  deksryptor, co przy dużej ilości deksryptorów może być problematy-
+	  czne.
+
+	- potok nazwany z powłoki tworzymy za pomocą komendy:
+
+		mkfifo <opcje> nazwa_potoku
+
+	  w opcjach możemy dodać flagę -m [mode] lub --mode=[mode], gdzie 
+	  zamiast [mode] wpisujemy liczbę ósemkową odpowiadającą uprawnie-
+	  niom potoku.
+
+	  Potok nazwany możemy usunąc komendą:
+
+	  	unlink nazwa_potoku
+
+	  Z poziomu programu do utworzenia potoku nazwanego wykorzystujemy 
+	  funkcje mkfifo(), która przyjmuje w pierwszym argumencie nazwę
+	  potoku, a w drugim tryb potoku. Usuwamy go za pomocą funkcji
+	  unlink(), gdzie w pierwszym argumencie podajemy nazwę potoku.
+
+========================================================================
